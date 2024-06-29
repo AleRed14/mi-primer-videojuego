@@ -1,3 +1,5 @@
+from creacion import *
+
 speed_player = 1
 
 move_left = False
@@ -16,3 +18,5 @@ UL = 7
 
 player_w = 70
 player_h = 70
+
+player_01 = crear_rect()
