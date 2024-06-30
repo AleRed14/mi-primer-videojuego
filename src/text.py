@@ -35,3 +35,4 @@ rect_opciones_grande = agrandar_rect(rect_opciones)
 
 rect_salir = get_text_rect(texto_salir,(SCREEN_CENTER_BOTTOM[0],SCREEN_CENTER_BOTTOM[1]+25))
 rect_salir_grande = agrandar_rect(rect_salir)
+

@@ -24,3 +24,11 @@ def rect_aleatorio(width:int, height:int, max:int):
     dir = (1,3,7,9)
     return crear_rect(None,randint(0, width - ancho), randint(0, height - largo),
                     ancho, largo, get_new_color(), dir[randrange(len(dir))])
+
+def puntajes_aleatorios(cant):
+    lista_puntajes = []
+    contador = 0
+    for _ in range(cant):
+        lista_puntajes.append(f"JU{contador}:   puntaje: {randint(0,9999)}")
+        contador += 1
+    return lista_puntajes
