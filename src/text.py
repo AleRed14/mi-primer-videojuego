@@ -1,9 +1,16 @@
 import pygame
 from settings import *
-pygame.init()
+
+def mostrar_texto(superficie: pygame.Surface, texto: str, fuente: int,
+                  posicion: tuple[int,int], color: tuple[int,int,int],
+                  color_fondo: tuple[int,int,int]) -> None:
+    texto = fuente.render(f"{texto}", True, color,color_fondo)    
+    superficie.blit(texto, posicion)
 
 fuente_titulo = pygame.font.Font(None, FUENTETITULO) # Fuente, tamaño
 fuente_opciones = pygame.font.Font(None, FUENTEOPCIONES) # Fuente, tamaño
+
+
 
 titulo = fuente_titulo.render("Titulo del juego", True, WHITE)
 

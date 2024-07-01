@@ -1,5 +1,5 @@
 # Ideas:
-# - El juego va a tratar de nose
+# - El juego va a tratar de (arbitro de futbol que sanciona jugadores? o el juego de stardew valley)
 # - al perder, que haya una animacion, se espera 5 segundos y se pone la pantalla
 # de game over, pidiendo que ingreses tu nombre con un maximo de tres digitos
 # si entra dentro de los 5 maximos puntajes guardar en el archivo
