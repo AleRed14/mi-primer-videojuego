@@ -1,29 +1,12 @@
-# Ideas:
-# - El juego va a tratar de (arbitro de futbol que sanciona jugadores? o el juego de stardew valley)
-# - al perder, que haya una animacion, se espera 5 segundos y se pone la pantalla
-# de game over, pidiendo que ingreses tu nombre con un maximo de tres digitos
-# si entra dentro de los 5 maximos puntajes guardar en el archivo
-# Agregar un boton que muestre las colisiones
-
-
-# - Puntajes
-# Mostrar los 5 mayores puntajes del juego
-# se debe mostrar primero el nombre, depues el puntaje con un "pts"
-# ver que otras cosas se pueden agregar
-# - menu opciones
-# opciones para subir y bajar el volumen de los sonidos y la musica
-# ver si se puede tambien de la resolucion
-# agregar opcion de guardar, avisar si los cambios no estan guardados
 
 
 # Importamos
 import pygame
 from settings import *
 from pygame.locals import *
+from funciones import *
 from imagenes import *
-from players import *
-from text import *
-from colisiones import *
+from texto import *
 from aleatorios import *
 
 # Iniciamos pygame
@@ -32,26 +15,37 @@ pygame.init()
 # Pantalla
 SCREEN = pygame.display.set_mode(SCREEN_SIZE) # Tamaño pantalla
 pygame.display.set_caption("Primer juego") # Titulo en ventana
+fondo_estadio = crear_fondo("fondo_estadio.jpg",SCREEN_SIZE)
+fondo_copas = crear_fondo("fondo_copas.jpg",SCREEN_SIZE)
+fondo_copas1 = crear_fondo("fondo_copas1.jpg",SCREEN_SIZE)
+
+# Fuente
+fuente_titulo = pygame.font.Font(None, FUENTE_TITULO) # Fuente, tamaño
+fuente_opciones = pygame.font.Font(None, FUENTEO_PCIONES) # Fuente, tamaño
 
 # Tiempo
 clock = pygame.time.Clock()
 
-# inicializaciones
-mouse_position = (0,0)
+# Cargo sonido
+# sonido_ambiente = pygame.mixer.Sound("./src/assets/sonidos/sonido_ambiente.mp3")
+pygame.mixer.music.load("./src/assets/sonidos/sonido_ambiente.mp3")
+# pygame.mixer.music.load("./src/assets/musica_fondo.mp3")
 
-PR = "A"
-PU = "B"
-OP = "C"
+# pygame.mixer.music.set_volume(0.1)
 
+# Inicializaciones
+fondo = fondo_estadio
+menu = MENU_PR
 cant = 5
 lista_puntajes = puntajes_aleatorios(cant)
+volumen_sonido = 5
+volumen_musica = 5
+lista_volumen_sonido = [0.0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0]
+lista_volumen_musica = [0.0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0]
+pygame.mixer.music.play(-1)
 
-
-fondo = fondo_ruinas
-menu = PR
-
+# sonido_ambiente.play()
 is_running = True
-
 while is_running:
     clock.tick(FPS)
 
@@ -59,79 +53,119 @@ while is_running:
 
     for event in pygame.event.get():
         if event.type == QUIT:
-            is_running = False
+            salir_juego()
         if event.type == MOUSEMOTION:
             mouse_position = event.pos
         if event.type == MOUSEBUTTONDOWN:
             if event.button == 1:
                 click_position = event.pos
-                if menu == PR:
-                    if punto_en_rectangulo(click_position,rect_jugar_grande):
+                if menu == MENU_PR:
+                    if punto_en_rectangulo(click_position, rect_jugar_grande):
                         print("JUGAR")
-                        fondo = fondo_ruinas
-                    if punto_en_rectangulo(click_position,rect_puntaje_grande):
-                        fondo = fondo_medallas
-                        menu = PU
-                    if punto_en_rectangulo(click_position,rect_opciones_grande):
-                        fondo = fondo_casquillos
-                        menu = OP
-                    if punto_en_rectangulo(click_position,rect_salir_grande):
-                        is_running = False
-                elif menu == PU:
-                    if punto_en_rectangulo(click_position,rect_salir_grande):
-                        menu = PR
-                        fondo = fondo_ruinas
-                elif menu == OP:
-                    if punto_en_rectangulo(click_position,rect_salir_grande):
-                        menu = PR
-                        fondo = fondo_ruinas
+                    if punto_en_rectangulo(click_position, rect_puntajes_grande):
+                        menu = MENU_PU
+                        fondo = fondo_copas1
+                    if punto_en_rectangulo(click_position, rect_opciones_grande):
+                        menu = MENU_OP
+                    if punto_en_rectangulo(click_position, rect_salir_grande):
+                        salir_juego()
+                elif menu == MENU_PU:
+                    if punto_en_rectangulo(click_position, rect_salir_grande):
+                        menu = MENU_PR
+                elif menu == MENU_OP:
+                    if punto_en_rectangulo(click_position, rect_menos_sonido_grande):
+                        if volumen_sonido > 0:
+                            volumen_sonido -= 1
+                    if punto_en_rectangulo(click_position, rect_mas_sonido_grande):
+                        if volumen_sonido < 10:
+                            volumen_sonido += 1
+                        
+                    if punto_en_rectangulo(click_position, rect_menos_musica_grande):
+                        if volumen_musica > 0:
+                            volumen_musica -= 1
+                        
+                    if punto_en_rectangulo(click_position, rect_mas_musica_grande):
+                        if volumen_musica < 10:
+                            volumen_musica += 1
+                        
+                    if punto_en_rectangulo(click_position, rect_salir_grande):
+                        menu = MENU_PR
 
-                
-        
-                
 
     # Actualizar eventos
-
-    
+    # sonido_ambiente.set_volume(lista_volumen_sonido[volumen_sonido])
+    pygame.mixer.music.set_volume(lista_volumen_sonido[volumen_musica])
 
     # Dibujar pantalla
 
     SCREEN.blit(fondo,ORIGIN)
     
-    if menu == PR:
-        SCREEN.blit(texto_jugar, rect_jugar)
-        SCREEN.blit(titulo, rect_titulo)
-        SCREEN.blit(texto_puntaje, rect_puntajes)
-        SCREEN.blit(texto_opciones, rect_opciones)
-        SCREEN.blit(texto_salir, rect_salir)
-        if punto_en_rectangulo(mouse_position,rect_jugar_grande):
-            pygame.draw.rect(SCREEN,WHITE,rect_jugar_grande,10)
-        if punto_en_rectangulo(mouse_position,rect_puntaje_grande):
-            pygame.draw.rect(SCREEN,WHITE,rect_puntaje_grande,10)
-        if punto_en_rectangulo(mouse_position,rect_opciones_grande):
-            pygame.draw.rect(SCREEN,WHITE,rect_opciones_grande,10)
-        if punto_en_rectangulo(mouse_position,rect_salir_grande):
-            pygame.draw.rect(SCREEN,WHITE,rect_salir_grande,10)
-    elif menu == PU:
+    
+    if menu == MENU_PR:
+        mostrar_texto(SCREEN, "A referee's day", fuente_titulo, TITULO_POS,
+                   WHITE)
+        
+        rect_jugar = mostrar_texto_con_rect(SCREEN, "JUGAR",
+                                        fuente_opciones, JUGAR_POS, WHITE)
+        rect_jugar_grande = agrandar_rect(rect_jugar)
+        if punto_en_rectangulo(mouse_position, rect_jugar):
+            pygame.draw.rect(SCREEN, WHITE, rect_jugar_grande,10)
+
+        rect_puntajes = mostrar_texto_con_rect(SCREEN, "PUNTAJES",
+                                        fuente_opciones, PUNTAJES_POS, WHITE)
+        rect_puntajes_grande = agrandar_rect(rect_puntajes)
+        if punto_en_rectangulo(mouse_position, rect_puntajes):
+            pygame.draw.rect(SCREEN, WHITE, rect_puntajes_grande,10)
+
+        rect_opciones = mostrar_texto_con_rect(SCREEN, "OPCIONES",
+                                        fuente_opciones, OPCIONES_POS, WHITE)
+        rect_opciones_grande = agrandar_rect(rect_opciones)
+        if punto_en_rectangulo(mouse_position, rect_opciones):
+            pygame.draw.rect(SCREEN, WHITE, rect_opciones_grande,10)
+
+    elif menu == MENU_PU:
+        mostrar_texto(SCREEN, "Mejores puntajes", fuente_titulo, TITULO_POS,
+                   WHITE)
         y_last = SCREEN_CENTER[1] - 100
-        SCREEN.blit(texto_salir, rect_salir)
-        if punto_en_rectangulo(mouse_position,rect_salir_grande):
-            pygame.draw.rect(SCREEN,RED,rect_salir_grande,10)
         for puntaje in lista_puntajes:
-            text_puntaje = fuente_opciones.render(puntaje,True,RED,WHITE)
-            rect_puntaje = get_text_rect(text_puntaje,(SCREEN_CENTER[0], y_last))
+            mostrar_texto(SCREEN, puntaje, fuente_opciones,(SCREEN_CENTER[0],
+                            y_last), WHITE, color_fondo = BLACK)
             y_last += 50
-            SCREEN.blit(text_puntaje, rect_puntaje)
-    else:
-        # Opciones con dos flechas para cambiar: volumen sonidos y volumen
-        # musica
-        SCREEN.blit(texto_salir, rect_salir)
-        if punto_en_rectangulo(mouse_position,rect_salir_grande):
-            pygame.draw.rect(SCREEN,RED,rect_salir_grande,10)
+    elif menu == MENU_OP:
+        mostrar_texto(SCREEN, "Opciones", fuente_titulo, TITULO_POS,
+                   WHITE)
+        mostrar_texto(SCREEN, f"VOLUMEN SONIDO:      {str(volumen_sonido)}", fuente_opciones,VOL_SON_POS, WHITE)
+        mostrar_texto(SCREEN, f"VOLUMEN MUSICA:      {str(volumen_musica)}", fuente_opciones,VOL_MUSIC_POS, WHITE)
 
-            
+        rect_menos_sonido = mostrar_texto_con_rect(SCREEN, "<",
+                                        fuente_opciones, MENOS_SONIDO_POS, WHITE)
+        rect_menos_sonido_grande = agrandar_rect(rect_menos_sonido)
+        if punto_en_rectangulo(mouse_position, rect_menos_sonido):
+            pygame.draw.rect(SCREEN, WHITE, rect_menos_sonido_grande,5)
+        
+        rect_mas_sonido = mostrar_texto_con_rect(SCREEN, ">",
+                                        fuente_opciones, MAS_SONIDO_POS, WHITE)
+        rect_mas_sonido_grande = agrandar_rect(rect_mas_sonido)
+        if punto_en_rectangulo(mouse_position, rect_mas_sonido):
+            pygame.draw.rect(SCREEN, WHITE, rect_mas_sonido_grande,5)
+        
+        rect_menos_musica = mostrar_texto_con_rect(SCREEN, "<",
+                                        fuente_opciones, MENOS_MUSIC_POS, WHITE)
+        rect_menos_musica_grande = agrandar_rect(rect_menos_musica)
+        if punto_en_rectangulo(mouse_position, rect_menos_musica):
+            pygame.draw.rect(SCREEN, WHITE, rect_menos_musica_grande,5)
+        
+        rect_mas_musica = mostrar_texto_con_rect(SCREEN, ">",
+                                        fuente_opciones, MAS_MUSIC_POS, WHITE)
+        rect_mas_musica_grande = agrandar_rect(rect_mas_musica)
+        if punto_en_rectangulo(mouse_position, rect_mas_musica):
+            pygame.draw.rect(SCREEN, WHITE, rect_mas_musica_grande,5)
 
-            
+    rect_salir = mostrar_texto_con_rect(SCREEN, "SALIR",
+                                    fuente_opciones, SALIR_POS, WHITE)
+    rect_salir_grande = agrandar_rect(rect_salir)
+    if punto_en_rectangulo(mouse_position, rect_salir):
+        pygame.draw.rect(SCREEN, WHITE, rect_salir_grande,10)
 
     # Actualizar pantalla
 

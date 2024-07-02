@@ -1,5 +1,6 @@
 from creacion import *
 from random import randrange,randint
+
 def get_color(lista):
     return lista[randrange(len(lista))]
 
