@@ -4,3 +4,7 @@ env/
 env\Scripts\activate.ps1
 pip freeze > requirements.txt
 pip install -r requirements.txt
+
+git add .
+git commit -m ""
+git push
