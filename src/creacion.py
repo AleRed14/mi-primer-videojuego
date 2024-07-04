@@ -1,14 +1,21 @@
 import pygame
+from settings import *
 
-def crear_rect(imagen = None, left: int = 0, top: int = 0, ancho: int = 50, 
-               largo: int = 50, color: tuple = (255, 255, 255), dir: int = 3,
-               borde: int = 0, radio: int = -1) -> dict:
+def crear_bloque(imagen: pygame.Surface = None,left:int = 0, top:int = 0, ancho:int = 50, largo:int = 50, 
+             color:tuple[int,int,int] = (255, 255, 255), dir:int = 3, borde:int = 0, 
+             radio:int = -1, speed_x: int = 1, speed_y: int = 1,
+             ) -> dict:
     if imagen:
-      imagen = pygame.transform.scale(imagen, (ancho, largo))
+      imagen = pygame.transform.scale(imagen,(ancho,largo))
     return {"rect": pygame.Rect(left,top,ancho,largo), "color": color, 
-            "dir": dir, "borde": borde, "radio": radio, "img": imagen}
+            "dir": dir, "borde": borde, "radio": radio, "img": imagen,
+            "speed_x": speed_x, "speed_y": speed_y}
 
-def crear_coin(coin_w: int = 25, coin_h: int = 25, left: int = 0,
-               top: int = 0, color: tuple = (255, 255, 0), imagen = None):
-    return crear_rect(imagen,left, top, coin_w, coin_h, color, 0, 0, 
-                      coin_h // 2)
+def crear_tarjeta(posicion: tuple[int,int], color:tuple[int,int,int] = RED, speed: int = 5):
+   r = pygame.Rect(0,0, LASER_WIDTH, LASER_HEIGHT)
+   r.midbottom = posicion
+   return {"rect": r, "color": color, "speed": speed}
+
+def crear_jugador(imagen: pygame.Surface, left:int = 0, top:int = 0, ancho:int = 50,
+                  largo:int = 50, dir:int = 0, speed_x:int = 1, speed_y:int = 1):
+   return crear_bloque(imagen, left, top, ancho, largo, dir = dir,speed_x = speed_x, speed_y = speed_y)
