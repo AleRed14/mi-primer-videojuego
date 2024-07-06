@@ -31,3 +31,20 @@ def colision_circulos(rect_1:tuple, rect_2:tuple)->bool:
     r2 = rect_2.width // 2
     distancia = distancia_entre_puntos(rect_1.center ,rect_2.center)
     return distancia <= r1 + r2
+
+def detectar_colision_circulo_rect(rect_1:tuple, rect_2:tuple)->bool:
+    topright = rect_1.topright
+    topleft = rect_1.topleft
+    bottomright = rect_1.bottomright
+    bottomleft = rect_1.bottomleft
+    centro_circulo = rect_2.center
+    # r1 = rect_1.width // 2
+    r2 = rect_2.width // 2
+    # distancia = distancia_entre_puntos(rect_1.center ,rect_2.center)
+    if distancia_entre_puntos(topright,centro_circulo) <= r2 or \
+        distancia_entre_puntos(topleft,centro_circulo) <= r2 or \
+        distancia_entre_puntos(bottomright,centro_circulo) <= r2 or \
+        distancia_entre_puntos(bottomleft,centro_circulo) <= r2:
+        return True
+    else:
+        return False
