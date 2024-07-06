@@ -51,6 +51,7 @@ move_left = False
 move_right = False
 move_up = False
 move_down = False
+move_left_a = False
 speed_player_x = 3
 speed_player_y = 3
 
@@ -65,7 +66,15 @@ UR = 9
 DR = 3
 DL = 1
 UL = 7
-TUPLE_DIR = (1,2,3,4,6,7,8,9)
+TUPLE_DIR = (0,1,2,3,4,6,7,8,9)
+QUIETO = 0
+MOVE_LADO = 1
+MOVE_DOWN = 2
+P_SACAR_AMARILLA = 3
+P_SACAR_ROJA = 4
+P_MOVE_UP = 5
+P_GAME_OVER = 6
+J_MOVE_UP = 3
 
 volumen_sonido = 1
 volumen_musica = 1
