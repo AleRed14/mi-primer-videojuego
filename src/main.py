@@ -46,8 +46,8 @@ def main_menu():
                     if punto_en_rectangulo(click_position, rect_jugar_grande):
                         print("JUGAR")
                         pygame.mixer.music.pause()
-                        score = game_loop(SCREEN)
-                        game_over_screen(SCREEN, score)
+                        game_loop(SCREEN)
+                        pygame.mixer.music.unpause()
                     if punto_en_rectangulo(click_position, rect_puntajes_grande):
                         print("PUNTAJES")
                         menu_puntajes(SCREEN, mouse_position)

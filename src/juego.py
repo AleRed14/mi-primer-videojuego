@@ -39,6 +39,7 @@ def game_loop(screen):
     volumenes = cargar_lista_json("volumenes.json")
     volumen_sonido = volumenes[0]["sonido"]
     sonido_ambiente.set_volume(TUPLE_VOLUMEN[volumen_sonido])
+    playing_sound = True
 
     sonido_ambiente.play(-1)
     
@@ -168,6 +169,19 @@ def game_loop(screen):
                     hitbox = True
                 if event.key == K_r:
                     color_tarjeta = RED
+                if event.key == K_m:
+                    if playing_sound:
+                        sonido_ambiente.stop()
+                        playing_sound = False
+                    else:
+                        sonido_ambiente.play(-1)
+                        playing_sound = True
+                if event.key == K_p:
+                    mostrar_texto(SCREEN,"Pausa", fuente, MESSAGE_STAR_POS, RED, True)
+                    pygame.mixer.music.pause()
+                    wait_user(K_p)
+                    if playing_sound:
+                        sonido_ambiente.play(-1)
             if event.type == KEYUP:
                 if event.key == K_LEFT:
                     move_left = False
@@ -406,6 +420,8 @@ def game_loop(screen):
         screen.blit(fondo_cancha_horizontal,ORIGIN)
 
         mostrar_texto(screen, f"Score: {score}", fuente, SCORE_POS, WHITE, color_fondo= BLACK)
+        if not playing_sound:
+            mostrar_texto(SCREEN,"mute", fuente, MUTE_POS, RED)
         for pos in lista_enojo_pos:
             screen.blit(imagen_cara_enojada,pos)
         if tarjeta:
@@ -445,8 +461,7 @@ def game_loop(screen):
 
         pygame.display.flip()
     sonido_ambiente.stop()
-    return score
-    # game_over_screen(screen, score)
+    game_over_screen(screen, score)
 
 
 # Finalizar

@@ -13,27 +13,24 @@ def game_over_screen(screen, score):
     
     name = input("Enter your initials: ")
     # Guardar el puntaje en el archivo
+    # name = "nose"
     puntaje = [new_puntaje(name, score)]
     append_archivo_csv("puntajes.csv", puntaje)
-    is_runnig = True
-    while is_runnig:
+    game_over = True
+    mostrar_texto(screen,f"Score: {score}", fuente, MESSAGE_STAR_POS, WHITE)
+    mostrar_texto(screen,f"SPACE PARA SALIR", fuente, SCREEN_CENTER_BOTTOM, WHITE)
+    mostrar_texto(screen,f"GAME OVER", fuente, SCREEN_CENTER, WHITE, True)
+    while game_over:
 
         for event in pygame.event.get():
             if event.type == QUIT:
                 salir_juego()
             if event.type == KEYDOWN:
-                if event.type == K_SPACE:
-                    is_runnig = False
-                    from main import main_menu
-                    main_menu()
-        screen.fill(BLACK)
-        mostrar_texto(screen,f"Score: {score}", fuente, MESSAGE_STAR_POS, WHITE)
-        mostrar_texto(screen,f"SPACE PARA SALIR", fuente, SCREEN_CENTER_BOTTOM, WHITE)
-        mostrar_texto(screen,f"GAME OVER", fuente, SCREEN_CENTER, WHITE, True)
-
-        # Actualizar pantalla
-
-        pygame.display.flip()
+                if event.key == K_SPACE:
+                    game_over = False
+                    # from main import main_menu
+                    # main_menu()
+        # screen.fill(BLACK)
 
         
 
