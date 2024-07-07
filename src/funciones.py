@@ -25,3 +25,17 @@ def wait_user_click(rect: pygame.Rect):
                 if event.button == 1:
                     if punto_en_rectangulo(event.pos,rect):
                         continuar = False
+
+def ordenar_listas_de_dicts(lista_dicts:list,target:str,asc:bool = True)->None:
+    auxiliar = None
+    tam = len(lista_dicts)
+    for i in range(tam - 1):
+        for j in range(i + 1, tam):
+            if (asc and lista_dicts[i][target] < lista_dicts[j][target]or
+            (not asc and lista_dicts[i][target] > lista_dicts[j][target])):
+                swap_lista(lista_dicts,i,j)
+
+def swap_lista(lista:list, i:int, j:int)->None:
+    auxiliar = lista[i]
+    lista[i] = lista[j]
+    lista[j] = auxiliar
