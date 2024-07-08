@@ -19,5 +19,5 @@ def crear_tarjeta(posicion: tuple[int,int], color:tuple[int,int,int] = RED, spee
 def crear_jugador(imagen: pygame.Surface, left:int = 0, top:int = 0, ancho:int
                    = 50, largo:int = 50, color_tarjeta: tuple[int,int,int] = 
                    YELLOW, dir:int = 0, speed_x:int = 1, speed_y:int = 1):
-   return crear_bloque(imagen, left, top, ancho, largo, color_tarjeta, dir,
+   return crear_bloque(imagen, left, top, ancho, largo, color_tarjeta, dir, 3,
                        speed_x = speed_x, speed_y = speed_y)

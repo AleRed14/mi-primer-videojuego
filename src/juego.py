@@ -17,6 +17,10 @@ sprite_jugador_red = pygame.image.load(f"./src/assets/imagenes/sprites/red.png")
 sprite_jugador_blue = pygame.image.load(f"./src/assets/imagenes/sprites/boca.png")
 imagen_cara_enojada = pygame.image.load(f"./src/assets/imagenes/cara_enojada.png")
 imagen_cara_enojada = pygame.transform.scale(imagen_cara_enojada, (LIVE_WIDTH, LIVE_HEIGHT))
+imagen_speed = pygame.image.load(f"./src/assets/imagenes/speed.png")
+imagen_speed = pygame.transform.scale(imagen_speed, (LIVE_WIDTH, LIVE_HEIGHT))
+imagen_tarjetas = pygame.image.load(f"./src/assets/imagenes/tarjetas.png")
+imagen_tarjetas = pygame.transform.scale(imagen_tarjetas, (LIVE_WIDTH, LIVE_HEIGHT))
 
 
 
@@ -36,9 +40,13 @@ def game_loop(screen):
     # Inicializaciones
     # Sonido
     sonido_ambiente = pygame.mixer.Sound("./src/assets/sonidos/sonido_ambiente.mp3")
+    sonido_silbato = pygame.mixer.Sound("./src/assets/sonidos/silbato.mp3")
+    sonido_abucheo = pygame.mixer.Sound("./src/assets/sonidos/abucheo.mp3")
     volumenes = cargar_lista_json("volumenes.json")
     volumen_sonido = volumenes[0]["sonido"]
     sonido_ambiente.set_volume(TUPLE_VOLUMEN[volumen_sonido])
+    sonido_silbato.set_volume(TUPLE_VOLUMEN[volumen_sonido])
+    sonido_abucheo.set_volume(TUPLE_VOLUMEN[volumen_sonido])
     playing_sound = True
 
     sonido_ambiente.play(-1)
@@ -46,9 +54,16 @@ def game_loop(screen):
     # Eventos
     TIMERMOVE = USEREVENT + 1
     GAMETIMEOUT = USEREVENT + 2
+    POWERUPTIME = USEREVENT + 3
+    POWERUPTIMER = USEREVENT + 3
     tiempo_de_espera = 1000
+    tiempo_de_power_up = 5000
     pygame.time.set_timer(TIMERMOVE, tiempo_de_espera)
     pygame.time.set_timer(GAMETIMEOUT, 45000)
+    pygame.time.set_timer(POWERUPTIME, tiempo_de_power_up)
+    bandera_movimiento = False
+    bandera_power_up_pantalla = False
+    power_up = None
 
     CARD_SPEED = 5
     vida_x = 50
@@ -79,7 +94,8 @@ def game_loop(screen):
                                              PLAYER_HEIGHT, PLAYER_WIDTH,
                                              PLAYER_HEIGHT), *SCREEN_CENTER,
                                              player_w, player_h, borde = 3,
-                                             speed_x = 5)
+                                             speed_x = speed_player_x, speed_y
+                                             = speed_player_y)
 
     # Enemigos
 
@@ -89,22 +105,30 @@ def game_loop(screen):
     lista_enojo_pos = []
     jugadores_red = []
     jugadores_blue = []
-    tiempo_movimiento = False
     tarjeta_jug = None
+    sprite_r = sprite_jugador_red.subsurface(frame *
+                        PLAYER_WIDTH, e_move * PLAYER_HEIGHT, PLAYER_WIDTH,
+                        PLAYER_HEIGHT)
+    sprite_b = sprite_jugador_blue.subsurface(frame *
+                        PLAYER_WIDTH, e_move * PLAYER_HEIGHT, PLAYER_WIDTH,
+                        PLAYER_HEIGHT)
     for _ in range(cant_jugadores_x_equipo):
-        jugadores_red.append(crear_jugador(sprite_jugador_red.subsurface(frame *
-                        PLAYER_WIDTH, e_move * PLAYER_HEIGHT, PLAYER_WIDTH,
-                        PLAYER_HEIGHT), randint(0, WIDTH - PLAYER_WIDTH), 
-                        randint(0, HEIGHT - PLAYER_HEIGHT), color_tarjeta =
-                        TUPLA_COLOR_TARJETA[randrange(len(TUPLA_COLOR_TARJETA)
-                        )], dir = TUPLE_DIR[randrange(len(TUPLE_DIR))],
+        left = randint(0, WIDTH - PLAYER_WIDTH)
+        top = randint(0, HEIGHT - PLAYER_HEIGHT)
+        color_tarjeta = TUPLA_COLOR_TARJETA[randrange(len(TUPLA_COLOR_TARJETA))]
+        dir = TUPLE_DIR[randrange(len(TUPLE_DIR))]
+
+        jugadores_red.append(crear_jugador(sprite_r, left, 
+                        top, color_tarjeta = color_tarjeta, dir = dir,
                         speed_x = speed_player_x, speed_y = speed_player_y))
-        jugadores_blue.append(crear_jugador(sprite_jugador_blue.subsurface(frame *
-                        PLAYER_WIDTH, e_move * PLAYER_HEIGHT, PLAYER_WIDTH,
-                        PLAYER_HEIGHT), randint(0, WIDTH - PLAYER_WIDTH), 
-                        randint(0, HEIGHT - PLAYER_HEIGHT), color_tarjeta =
-                        TUPLA_COLOR_TARJETA[randrange(len(TUPLA_COLOR_TARJETA)
-                        )], dir = TUPLE_DIR[randrange(len(TUPLE_DIR))],
+        
+        left = randint(0, WIDTH - PLAYER_WIDTH)
+        top = randint(0, HEIGHT - PLAYER_HEIGHT)
+        color_tarjeta = TUPLA_COLOR_TARJETA[randrange(len(TUPLA_COLOR_TARJETA))]
+        dir = TUPLE_DIR[randrange(len(TUPLE_DIR))]
+
+        jugadores_blue.append(crear_jugador(sprite_b, left, 
+                        top, color_tarjeta = color_tarjeta, dir = dir,
                         speed_x = speed_player_x, speed_y = speed_player_y))
 
     is_running = True
@@ -136,26 +160,31 @@ def game_loop(screen):
                     move_up = False
                     
                 if event.key == K_KP4:
+                    sonido_silbato.play()
                     if not tarjeta:
                         tarjeta = crear_tarjeta(player["rect"].midleft, color_tarjeta, CARD_SPEED)
                         tarjeta_dir = L
                     
                 if event.key == K_KP6:
+                    sonido_silbato.play()
                     if not tarjeta:
                         tarjeta = crear_tarjeta(player["rect"].midright, color_tarjeta, CARD_SPEED)
                         tarjeta_dir = R
                     
                 if event.key == K_KP8:
+                    sonido_silbato.play()
                     if not tarjeta:
                         tarjeta = crear_tarjeta(player["rect"].midtop, color_tarjeta, CARD_SPEED)
                         tarjeta_dir = U
                     
                 if event.key == K_KP2:
+                    sonido_silbato.play()
                     if not tarjeta:
                         tarjeta = crear_tarjeta(player["rect"].midbottom, color_tarjeta, CARD_SPEED)
                         tarjeta_dir = D
 
                 if event.key == K_KP5:
+                    sonido_silbato.play()
                     pos_tarjeta_sacada = player["rect"]
                     # print(pos_tarjeta_sacada)
                     if color_tarjeta == YELLOW:
@@ -166,7 +195,10 @@ def game_loop(screen):
                 if event.key == K_y:
                     color_tarjeta = YELLOW
                 if event.key == K_h:
-                    hitbox = True
+                    if hitbox:
+                        hitbox = False
+                    else:
+                        hitbox = True
                 if event.key == K_r:
                     color_tarjeta = RED
                 if event.key == K_m:
@@ -180,6 +212,10 @@ def game_loop(screen):
                     mostrar_texto(SCREEN,"Pausa", fuente, MESSAGE_STAR_POS, RED, True)
                     pygame.mixer.music.pause()
                     wait_user(K_p)
+                    move_left = False
+                    move_right = False
+                    move_up = False
+                    move_down = False
                     if playing_sound:
                         sonido_ambiente.play(-1)
             if event.type == KEYUP:
@@ -193,10 +229,19 @@ def game_loop(screen):
                     move_down = False
 
             if event.type == TIMERMOVE:
-                tiempo_movimiento = not tiempo_movimiento
+                bandera_movimiento = not bandera_movimiento
                 pygame.time.set_timer(TIMERMOVE, tiempo_de_espera)
+            if event.type == POWERUPTIME:
+                bandera_power_up_pantalla = not bandera_movimiento
+                pygame.time.set_timer(POWERUPTIME, tiempo_de_power_up)
+            if event.type == POWERUPTIMER:
+                player["speed_x"] = speed_player_x
+                player["speed_y"] = speed_player_y
+                
+                # bandera_power_up_pantalla = not bandera_power_up_pantalla
 
             if event.type == GAMETIMEOUT or enojo_hinchada == 3:
+                move = P_GAME_OVER
                 is_running = False
 
 
@@ -213,28 +258,28 @@ def game_loop(screen):
 
         if move_left and player["rect"].left > 0:
             move = MOVE_LADO
-            if player["rect"].left - speed_player_x <= 0:
+            if player["rect"].left - player["speed_x"] <= 0:
                 player["rect"].left = 0
             else:
-                player["rect"].left -= speed_player_x
+                player["rect"].left -= player["speed_x"]
         if move_right and player["rect"].right < WIDTH:
             move = MOVE_LADO
-            if player["rect"].right + speed_player_x >= WIDTH:
+            if player["rect"].right + player["speed_x"] >= WIDTH:
                 player["rect"].right = WIDTH
             else:
-                player["rect"].right += speed_player_x
+                player["rect"].right += player["speed_x"]
         if move_down and player["rect"].bottom < HEIGHT:
             move = MOVE_DOWN
-            if player["rect"].bottom + speed_player_x >= HEIGHT:
+            if player["rect"].bottom + player["speed_y"] >= HEIGHT:
                 player["rect"].bottom = HEIGHT
             else:
-                player["rect"].bottom += speed_player_x
+                player["rect"].bottom += player["speed_y"]
         if move_up and player["rect"].top > 0:
             move = P_MOVE_UP
-            if player["rect"].top - speed_player_x <= 0:
+            if player["rect"].top - player["speed_y"] <= 0:
                 player["rect"].top = 0
             else:
-                player["rect"].top -= speed_player_x
+                player["rect"].top -= player["speed_y"]
 
         if tarjeta:
             if tarjeta_dir == U:
@@ -263,6 +308,7 @@ def game_loop(screen):
                             score += 1
                             jugadores_red.remove(jugador_red)
                         else:
+                            sonido_abucheo.play()
                             tarjeta = None
                             enojo_hinchada += 1
                             lista_enojo_pos.append((vida_x,vida_y))
@@ -274,10 +320,13 @@ def game_loop(screen):
                             jugadores_red.remove(jugador_red)
                             pos_tarjeta_sacada = None
                         else:
+                            sonido_abucheo.play()
                             pos_tarjeta_sacada = None
                             enojo_hinchada += 1
                             lista_enojo_pos.append((vida_x,vida_y))
                             vida_x += 50
+                    
+        
         for jugador_blue in jugadores_blue[:]:
             if len(jugadores_blue) > 0:
                 if tarjeta:
@@ -287,6 +336,7 @@ def game_loop(screen):
                             score += 1
                             jugadores_blue.remove(jugador_blue)
                         else:
+                            sonido_abucheo.play()
                             tarjeta = None
                             enojo_hinchada += 1
                             lista_enojo_pos.append((vida_x,vida_y))
@@ -298,10 +348,28 @@ def game_loop(screen):
                             jugadores_blue.remove(jugador_blue)
                             pos_tarjeta_sacada = None
                         else:
+                            sonido_abucheo.play()
                             pos_tarjeta_sacada = None
                             enojo_hinchada += 1
                             lista_enojo_pos.append((vida_x,vida_y))
                             vida_x += 50
+                    
+        pos_tarjeta_sacada = None
+
+        if power_up:
+            if detectar_colision_circulo_rect(player["rect"],power_up["rect"]):
+                print("power")
+                if name_pw == "speed":
+                    player["speed_x"] = 3
+                    player["speed_y"] = 3
+                    power_up = None
+                    pygame.time.set_timer(POWERUPTIMER, tiempo_de_power_up)
+                else:
+                    power_up = None
+                    score += len(jugadores_red) + len(jugadores_blue)
+                    jugadores_red = []
+                    jugadores_blue = []
+
 
         if len(jugadores_red) == 0 and len(jugadores_blue) == 0:
             cant_jugadores_x_equipo += 1
@@ -328,7 +396,7 @@ def game_loop(screen):
 
         current_time = pygame.time.get_ticks()
 
-        if tiempo_movimiento:
+        if bandera_movimiento:
             # print("hola")
             for jugador_red in jugadores_red:
                 # print(jugador["dir"])
@@ -408,17 +476,35 @@ def game_loop(screen):
                 PLAYER_WIDTH, PLAYER_HEIGHT)
                 jugador_blue["img"] = pygame.transform.scale(jugador_blue["img"],(player_w,player_h))
                 jugador_blue["dir"] = TUPLE_DIR[randrange(len(TUPLE_DIR))]
+
+        if bandera_power_up_pantalla:
+            bandera_power_up_pantalla = False
+            name_pw = TUPLA_POWERUP[randrange(len(TUPLA_POWERUP))]
+            # name_pw = "all out"
+            left = randint(0, WIDTH - PLAYER_WIDTH)
+            top = randint(0, HEIGHT - PLAYER_HEIGHT)
+            if name_pw == "speed":
+                power_up = crear_bloque(imagen_speed, left, top, LIVE_WIDTH,
+                                        LIVE_HEIGHT, borde = 3, radio = 
+                                        LIVE_WIDTH // 2)
+            else:
+                power_up = crear_bloque(imagen_tarjetas, left, top, LIVE_WIDTH - 15 ,
+                                        LIVE_HEIGHT - 15, borde = 3)
+
+        
             
         if current_time - ultima_actualizacion >= frame_time:
             frame += 1
-            if frame == 4:
+            if frame == 4 or move == P_GAME_OVER:
                 frame = 0
             ultima_actualizacion = current_time
         
         # Dibujar pantalla
 
         screen.blit(fondo_cancha_horizontal,ORIGIN)
-
+        
+        mostrar_texto(SCREEN, f"{pygame.time.get_ticks()//1000}.{str(pygame.time.get_ticks())[-3:]}",
+                    fuente, TIMER_POS, WHITE, color_fondo = BLACK)
         mostrar_texto(screen, f"Score: {score}", fuente, SCORE_POS, WHITE, color_fondo= BLACK)
         if not playing_sound:
             mostrar_texto(SCREEN,"mute", fuente, MUTE_POS, RED)
@@ -438,25 +524,30 @@ def game_loop(screen):
                 pygame.draw.rect(screen, tarjeta_jug["color"], tarjeta_jug["rect"])
         for jugador_blue in jugadores_blue:
             if hitbox:
-                pygame.draw.rect(screen, jugadores_blue["color"], jugadores_blue["rect"],
-                                    jugadores_blue["borde"], jugadores_blue["radio"])
+                pygame.draw.rect(screen, jugador_blue["color"], jugador_blue["rect"],
+                                    jugador_blue["borde"], jugador_blue["radio"])
                 pygame.draw.circle(screen,WHITE,jugador_blue["rect"].center,player_w//2,3)
             screen.blit(jugador_blue["img"],jugador_blue["rect"])
             tarjeta_jug = crear_tarjeta(jugador_blue["rect"].midtop, 
                             jugador_blue["color"])
             # if jugador_blue["color"] != WHITE:
             pygame.draw.rect(screen, tarjeta_jug["color"], tarjeta_jug["rect"])
-        if hitbox:
-            pygame.draw.rect(screen, player["color"], player["rect"],
-                                player["borde"], player["radio"])
 
-        pygame.draw.circle(screen,WHITE,player["rect"].center,player_w//2,3)
+            pygame.draw.circle(screen,WHITE,player["rect"].center,player_w//2,3)
         # midbottom
         if move_left_a:
             screen.blit(player_v,player["rect"])
         else:
             screen.blit(player["img"],player["rect"])
+        if power_up:
+            screen.blit(power_up["img"],power_up["rect"])
 
+        if hitbox:
+            pygame.draw.rect(screen, player["color"], player["rect"],
+                                player["borde"], player["radio"])
+            if power_up:
+                pygame.draw.rect(screen, power_up["color"], power_up["rect"],
+                                power_up["borde"], power_up["radio"])
         # Actualizar pantalla
 
         pygame.display.flip()
